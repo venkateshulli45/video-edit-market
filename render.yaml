@@ -1,0 +1,56 @@
+services:
+  - type: web
+    name: video-edit-market
+    runtime: node
+    buildCommand: npm run build
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+        placeholder: "postgresql://user:password@host:port/dbname?sslmode=require&schema=video_editor"
+      
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+
+      - key: NEXTAUTH_URL
+        sync: false
+        placeholder: "https://your-app-name.onrender.com"
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+        placeholder: "Your AWS Access Key ID (optional)"
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+        placeholder: "Your AWS Secret Access Key (optional)"
+
+      - key: AWS_REGION
+        value: "us-east-1"
+
+      - key: AWS_S3_BUCKET_NAME
+        sync: false
+        placeholder: "Your AWS S3 Bucket Name (optional)"
+
+      - key: STRIPE_SECRET_KEY
+        sync: false
+        placeholder: "Your Stripe Secret Key (optional)"
+
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+        placeholder: "Your Stripe Webhook Secret (optional)"
+
+      - key: RAZORPAY_KEY_ID
+        sync: false
+        placeholder: "Your Razorpay Key ID (optional)"
+
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+        placeholder: "Your Razorpay Key Secret (optional)"
+
+      - key: SENDGRID_API_KEY
+        sync: false
+        placeholder: "Your SendGrid API Key (optional)"
+
+      - key: EMAIL_FROM
+        sync: false
+        placeholder: "noreply@yourdomain.com (optional)"

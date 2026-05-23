@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:validate": "prisma validate"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
