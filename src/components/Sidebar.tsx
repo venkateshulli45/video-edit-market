@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
 	Sidebar as ShadcnSidebar,
@@ -46,20 +48,11 @@ interface UserSession {
 }
 
 interface SidebarProps {
-	currentRole: "ADMIN" | "USER"; // ADMIN, or USER which toggle views
+	currentRole: "ADMIN" | "USER";
 	activeView?: "CLIENT" | "PROVIDER";
 	onViewChange?: (view: "CLIENT" | "PROVIDER") => void;
 	session: UserSession;
 	onLogout: () => void;
-
-	// Dashboard Action Triggers
-	onOpenPostJob?: () => void;
-	onOpenSearchProviders?: () => void;
-	onOpenEscrow?: () => void;
-	onOpenEditClientProfile?: () => void;
-	onOpenBrowseJobs?: () => void;
-	onOpenMyProposals?: () => void;
-	onOpenEditProfile?: () => void;
 
 	// Admin Navigation Actions
 	activeAdminTab?: "approvals" | "users";
@@ -72,13 +65,6 @@ export default function Sidebar({
 	onViewChange,
 	session,
 	onLogout,
-	onOpenPostJob,
-	onOpenSearchProviders,
-	onOpenEscrow,
-	onOpenEditClientProfile,
-	onOpenBrowseJobs,
-	onOpenMyProposals,
-	onOpenEditProfile,
 	activeAdminTab,
 	onAdminTabChange,
 }: SidebarProps) {
@@ -86,6 +72,7 @@ export default function Sidebar({
 	const isCollapsed = state === "collapsed";
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme } = useTheme();
+	const pathname = usePathname();
 
 	// Handle hydration mismatch
 	useEffect(() => {
@@ -268,14 +255,9 @@ export default function Sidebar({
 								<>
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard#client-posted-jobs" />}
+											isActive={pathname === "/dashboard"}
 											tooltip="Your Posted Jobs"
-											onClick={() => {
-												const elem =
-													document.getElementById("client-posted-jobs");
-												if (elem) elem.scrollIntoView({ behavior: "smooth" });
-											}}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<FileText className="h-4.5 w-4.5 shrink-0" />
 											<span>Your Posted Jobs</span>
@@ -284,10 +266,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/post-job" />}
+											isActive={pathname === "/dashboard/post-job"}
 											tooltip="Post service request"
-											onClick={onOpenPostJob}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<PlusCircle className="h-4.5 w-4.5 shrink-0" />
 											<span>Post service request</span>
@@ -296,10 +277,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/search-providers" />}
+											isActive={pathname === "/dashboard/search-providers"}
 											tooltip="Search Providers"
-											onClick={onOpenSearchProviders}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<Search className="h-4.5 w-4.5 shrink-0" />
 											<span>Search Providers</span>
@@ -308,10 +288,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/escrow" />}
+											isActive={pathname === "/dashboard/escrow"}
 											tooltip="Manage Escrow"
-											onClick={onOpenEscrow}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<Calendar className="h-4.5 w-4.5 shrink-0" />
 											<span>Manage Escrow</span>
@@ -320,10 +299,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/edit-client-profile" />}
+											isActive={pathname === "/dashboard/edit-client-profile"}
 											tooltip="Edit Client Profile"
-											onClick={onOpenEditClientProfile}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<User className="h-4.5 w-4.5 shrink-0" />
 											<span>Edit Client Profile</span>
@@ -335,10 +313,9 @@ export default function Sidebar({
 								<>
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/browse-jobs" />}
+											isActive={pathname === "/dashboard/browse-jobs"}
 											tooltip="Browse Jobs"
-											onClick={onOpenBrowseJobs}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<Search className="h-4.5 w-4.5 shrink-0" />
 											<span>Browse Jobs</span>
@@ -347,10 +324,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/my-proposals" />}
+											isActive={pathname === "/dashboard/my-proposals"}
 											tooltip="My Proposals"
-											onClick={onOpenMyProposals}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<FileText className="h-4.5 w-4.5 shrink-0" />
 											<span>My Proposals</span>
@@ -359,14 +335,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard#provider-contracts" />}
+											isActive={pathname === "/dashboard"}
 											tooltip="Active Contracts"
-											onClick={() => {
-												const elem =
-													document.getElementById("provider-contracts");
-												if (elem) elem.scrollIntoView({ behavior: "smooth" });
-											}}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<Briefcase className="h-4.5 w-4.5 shrink-0" />
 											<span>Active Contracts</span>
@@ -375,10 +346,9 @@ export default function Sidebar({
 
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											type="button"
+											render={<Link href="/dashboard/edit-profile" />}
+											isActive={pathname === "/dashboard/edit-profile"}
 											tooltip="Professional Profile"
-											onClick={onOpenEditProfile}
-											className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400"
 										>
 											<User className="h-4.5 w-4.5 shrink-0" />
 											<span>Professional Profile</span>
@@ -440,7 +410,7 @@ export default function Sidebar({
 								<button
 									type="button"
 									onClick={cycleTheme}
-									className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all flex items-center justify-center"
+									className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all flex items-center justify-center shadow-xs"
 									title={getThemeLabel()}
 								>
 									{getThemeIcon()}
