@@ -1,15 +1,13 @@
 "use client";
 
-import {
-	CheckCircle,
-	Clock,
-	MessageSquare,
-	X,
-} from "lucide-react";
+import { CheckCircle, Clock, MessageSquare, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ChatRoom {
 	id: string;
@@ -95,7 +93,9 @@ export default function MessagesPage() {
 		(async () => {
 			if (!cancelled) await fetchRooms();
 		})();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [fetchRooms]);
 
 	const activeChats = rooms.filter((r) => !r.isPending || r.iAmInitiator);
@@ -198,10 +198,30 @@ export default function MessagesPage() {
 						<h3 className="font-semibold text-slate-700 dark:text-slate-300 mb-1">
 							No conversations yet
 						</h3>
-						<p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-							Send a chat request to a client or editor from their profile to
-							start messaging.
+						<p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-4">
+							Use the Message button on a provider profile, job bid, or contract
+							to send a chat request. They must accept before you can chat.
 						</p>
+						<div className="flex flex-wrap gap-2 justify-center">
+							<Link
+								href="/dashboard/search-providers"
+								className={cn(
+									buttonVariants({ variant: "default", size: "sm" }),
+									"bg-purple-600 hover:bg-purple-500 text-white font-semibold",
+								)}
+							>
+								Find an Editor
+							</Link>
+							<Link
+								href="/dashboard/browse-jobs"
+								className={cn(
+									buttonVariants({ variant: "outline", size: "sm" }),
+									"font-semibold",
+								)}
+							>
+								Browse Jobs
+							</Link>
+						</div>
 					</div>
 				) : (
 					<div className="space-y-2">

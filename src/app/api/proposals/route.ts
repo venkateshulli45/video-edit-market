@@ -74,6 +74,7 @@ export async function GET(req: NextRequest) {
 				include: {
 					provider: {
 						select: {
+							id: true,
 							email: true,
 							providerProfile: {
 								select: {
@@ -98,6 +99,7 @@ export async function GET(req: NextRequest) {
 				proposalText: prop.proposalText,
 				status: prop.status,
 				createdAt: prop.createdAt,
+				providerUserId: prop.provider.id,
 				providerName:
 					prop.provider.providerProfile?.fullName || prop.provider.email,
 				providerBio: prop.provider.providerProfile?.bio || "",

@@ -55,6 +55,7 @@ export async function GET(_req: NextRequest) {
 				estimatedDays: prop.estimatedDays,
 				proposalText: prop.proposalText,
 				createdAt: prop.createdAt,
+				providerUserId: prop.providerId,
 				providerName:
 					prop.provider.providerProfile?.fullName || prop.provider.email,
 				providerRating: prop.provider.providerProfile?.averageRating || 0,

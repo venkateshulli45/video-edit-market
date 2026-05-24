@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
 	Card,
 	CardContent,
@@ -21,6 +21,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
 	const {
@@ -382,13 +383,18 @@ export default function DashboardPage() {
 														Client: {c.clientName}
 													</p>
 												</div>
-												<div className="text-right whitespace-nowrap">
+												<div className="text-right whitespace-nowrap flex flex-col items-end gap-2">
 													<span className="text-lg font-bold text-blue-400">
 														${Number(c.agreedPrice).toFixed(2)}
 													</span>
 													<p className="text-xs text-slate-500 dark:text-slate-400/70 capitalize">
 														{c.status}
 													</p>
+													<StartChatButton
+														targetUserId={c.clientId}
+														targetName={c.clientName}
+														className="border-blue-500/40 text-blue-600 dark:text-blue-400"
+													/>
 												</div>
 											</div>
 										</Card>

@@ -4,6 +4,7 @@ import { Clock, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -143,31 +144,40 @@ export default function BrowseJobsPage() {
 										</p>
 									</div>
 
-									{job.canEditBid ? (
-										<Link
-											href={`/dashboard/edit-bid/${job.id}`}
-											className={cn(
-												buttonVariants({ variant: "outline", size: "sm" }),
-												"border-yellow-500/40 text-yellow-600 dark:text-yellow-400 font-bold px-4 py-1.5 h-auto text-xs",
-											)}
-										>
-											Edit Bid (Pending)
-										</Link>
-									) : job.hasBid ? (
-										<span className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold">
-											Proposal Submitted
-										</span>
-									) : (
-										<Link
-											href={`/dashboard/submit-bid/${job.id}`}
-											className={cn(
-												buttonVariants({ variant: "default", size: "sm" }),
-												"bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 h-auto text-xs shadow-xs",
-											)}
-										>
-											Submit Bid
-										</Link>
-									)}
+									<div className="flex flex-col items-stretch sm:items-end gap-2">
+										{job.clientUserId && (
+										<StartChatButton
+											targetUserId={job.clientUserId}
+											targetName={job.clientName}
+											className="border-blue-500/40 text-blue-600 dark:text-blue-400"
+										/>
+										)}
+										{job.canEditBid ? (
+											<Link
+												href={`/dashboard/edit-bid/${job.id}`}
+												className={cn(
+													buttonVariants({ variant: "outline", size: "sm" }),
+													"border-yellow-500/40 text-yellow-600 dark:text-yellow-400 font-bold px-4 py-1.5 h-auto text-xs",
+												)}
+											>
+												Edit Bid (Pending)
+											</Link>
+										) : job.hasBid ? (
+											<span className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold">
+												Proposal Submitted
+											</span>
+										) : (
+											<Link
+												href={`/dashboard/submit-bid/${job.id}`}
+												className={cn(
+													buttonVariants({ variant: "default", size: "sm" }),
+													"bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 h-auto text-xs shadow-xs",
+												)}
+											>
+												Submit Bid
+											</Link>
+										)}
+									</div>
 								</div>
 							</div>
 						</Card>

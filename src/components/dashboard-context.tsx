@@ -45,6 +45,7 @@ export interface Job {
 	createdAt: string;
 	category: { name: string };
 	clientName?: string;
+	clientUserId?: string;
 	hasBid?: boolean;
 	pendingProposalId?: string | null;
 	canEditBid?: boolean;
@@ -58,6 +59,7 @@ export interface Proposal {
 	proposalText: string;
 	status: "pending" | "accepted" | "rejected" | "withdrawn";
 	createdAt: string;
+	providerUserId?: string;
 	providerName?: string;
 	providerBio?: string;
 	providerSkills?: string[];
@@ -67,10 +69,12 @@ export interface Proposal {
 	jobBudget?: string | number;
 	jobStatus?: string;
 	clientName?: string;
+	clientUserId?: string;
 }
 
 export interface Provider {
 	id: string;
+	userId: string;
 	fullName: string;
 	bio: string | null;
 	skills: string[];

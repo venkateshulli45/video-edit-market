@@ -24,7 +24,9 @@ export async function GET(req: NextRequest, { params }: Params) {
 								id: true,
 								email: true,
 								clientProfile: { select: { fullName: true, avatarUrl: true } },
-								providerProfile: { select: { fullName: true, avatarUrl: true } },
+								providerProfile: {
+									select: { fullName: true, avatarUrl: true },
+								},
 							},
 						},
 					},

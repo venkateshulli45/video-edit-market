@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ interface BidRequest {
 	proposalText: string;
 	createdAt: string;
 	providerName: string;
+	providerUserId: string;
 	providerRating: string | number;
 	isUnread: boolean;
 }
@@ -166,7 +168,12 @@ export default function BidRequestsPage() {
 									Job budget: ${Number(req.jobBudget).toFixed(2)} · Rating:{" "}
 									{Number(req.providerRating).toFixed(1)}
 								</span>
-								<div className="flex gap-2">
+								<div className="flex flex-wrap justify-end gap-2">
+									<StartChatButton
+										targetUserId={req.providerUserId}
+										targetName={req.providerName}
+										className="border-slate-200 dark:border-slate-700"
+									/>
 									<Button
 										disabled={actionId === req.id}
 										onClick={() => handleAction(req.id, "reject")}

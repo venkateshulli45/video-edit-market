@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
-import { Calendar, CreditCard, ShieldCheck, CheckCircle2 } from "lucide-react";
-import { useDashboard } from "@/components/dashboard-context";
-import { Card, CardContent } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Calendar, CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import React from "react";
+import { useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function EscrowPage() {
 	const { session, contracts } = useDashboard();
@@ -151,6 +152,11 @@ export default function EscrowPage() {
 									>
 										{c.status}
 									</span>
+									<StartChatButton
+										targetUserId={c.providerId}
+										targetName={c.providerName}
+										className="border-purple-500/40 text-purple-600 dark:text-purple-400 mt-1"
+									/>
 								</div>
 							</div>
 						</Card>

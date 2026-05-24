@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
 								id: true,
 								email: true,
 								clientProfile: { select: { fullName: true, avatarUrl: true } },
-								providerProfile: { select: { fullName: true, avatarUrl: true } },
+								providerProfile: {
+									select: { fullName: true, avatarUrl: true },
+								},
 							},
 						},
 					},
@@ -192,22 +194,52 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		// Check if an active room already exists between these two users
-		const existingRoom = await db.chatRoom.findFirst({
+		// Active chat already exists between these two users
+		const activeRoom = await db.chatRoom.findFirst({
 			where: {
 				AND: [
 					{ members: { some: { userId: session.userId } } },
 					{ members: { some: { userId: targetUserId } } },
 				],
 			},
+			include: { _count: { select: { members: true } } },
 		});
 
-		if (existingRoom) {
+		if (activeRoom && activeRoom._count.members >= 2) {
 			return NextResponse.json({
 				message: "Chat room already exists",
-				roomId: existingRoom.id,
+				roomId: activeRoom.id,
 				alreadyExists: true,
+				status: "active",
 			});
+		}
+
+		// Pending outgoing request already sent to this user — do not create another
+		const myPendingRooms = await db.chatRoom.findMany({
+			where: {
+				members: { some: { userId: session.userId } },
+			},
+			include: { _count: { select: { members: true } } },
+		});
+
+		for (const room of myPendingRooms) {
+			if (room._count.members !== 1) continue;
+			const pendingNotif = await db.notification.findFirst({
+				where: {
+					userId: targetUserId,
+					type: "message",
+					title: "Chat Request",
+					message: { contains: `[roomId:${room.id}]` },
+				},
+			});
+			if (pendingNotif) {
+				return NextResponse.json({
+					message: "Chat request already sent",
+					roomId: room.id,
+					alreadyPending: true,
+					status: "pending_outgoing",
+				});
+			}
 		}
 
 		// Get current user's display name

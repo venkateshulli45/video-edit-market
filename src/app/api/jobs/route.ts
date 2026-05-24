@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
 					},
 					client: {
 						select: {
+							id: true,
 							email: true,
 							clientProfile: {
 								select: {
@@ -93,6 +94,7 @@ export async function GET(req: NextRequest) {
 				createdAt: job.createdAt,
 				category: job.category,
 				clientName: job.client.clientProfile?.fullName || job.client.email,
+				clientUserId: job.client.id,
 				hasBid: job.proposals.length > 0,
 				pendingProposalId:
 					job.proposals.find((p) => p.status === "pending")?.id ?? null,

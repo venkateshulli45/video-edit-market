@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { type Proposal, useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -223,7 +224,14 @@ export default function ViewBidsPage({
 								</div>
 
 								{prop.status === "pending" && job.status === "posted" ? (
-									<div className="flex space-x-2 shrink-0">
+									<div className="flex flex-wrap justify-end gap-2 shrink-0">
+										{prop.providerUserId && (
+											<StartChatButton
+												targetUserId={prop.providerUserId}
+												targetName={prop.providerName}
+												className="border-slate-200 dark:border-slate-700"
+											/>
+										)}
 										<Button
 											disabled={isActionSubmitting}
 											onClick={() => handleProposalAction(prop.id, "reject")}
@@ -242,15 +250,24 @@ export default function ViewBidsPage({
 										</Button>
 									</div>
 								) : (
-									<span
-										className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
-											prop.status === "accepted"
-												? "bg-green-500/10 text-green-400"
-												: "bg-slate-100 dark:bg-slate-800 text-slate-400"
-										}`}
-									>
-										Status: {prop.status}
-									</span>
+									<div className="flex items-center gap-2 shrink-0">
+										{prop.providerUserId && (
+											<StartChatButton
+												targetUserId={prop.providerUserId}
+												targetName={prop.providerName}
+												className="border-slate-200 dark:border-slate-700"
+											/>
+										)}
+										<span
+											className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
+												prop.status === "accepted"
+													? "bg-green-500/10 text-green-400"
+													: "bg-slate-100 dark:bg-slate-800 text-slate-400"
+											}`}
+										>
+											Status: {prop.status}
+										</span>
+									</div>
 								)}
 							</div>
 						</Card>

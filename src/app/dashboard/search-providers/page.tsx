@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Search, Award, Star } from "lucide-react";
-import { useDashboard } from "@/components/dashboard-context";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Award, Search, Star } from "lucide-react";
 import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { useDashboard } from "@/components/dashboard-context";
+import { StartChatButton } from "@/components/start-chat-button";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export default function SearchProvidersPage() {
 	const { providers, loadProviders } = useDashboard();
@@ -109,21 +110,28 @@ export default function SearchProvidersPage() {
 								</div>
 							</div>
 
-							<div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-1.5">
-								{p.skills.length > 0 ? (
-									p.skills.map((s) => (
-										<span
-											key={s}
-											className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold"
-										>
-											{s}
+							<div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+								<div className="flex flex-wrap gap-1.5">
+									{p.skills.length > 0 ? (
+										p.skills.map((s) => (
+											<span
+												key={s}
+												className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold"
+											>
+												{s}
+											</span>
+										))
+									) : (
+										<span className="text-xs text-slate-400 italic">
+											No skills listed
 										</span>
-									))
-								) : (
-									<span className="text-xs text-slate-400 italic">
-										No skills listed
-									</span>
-								)}
+									)}
+								</div>
+								<StartChatButton
+									targetUserId={p.userId}
+									targetName={p.fullName}
+									className="border-purple-500/40 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 shrink-0"
+								/>
 							</div>
 						</Card>
 					))}
