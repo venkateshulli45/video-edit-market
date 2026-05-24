@@ -7,7 +7,7 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
-        placeholder: "postgresql://user:password@host:port/dbname?sslmode=require&schema=video_editor"
+        placeholder: "postgresql://neondb_owner:npg_bHwJCK0FZk3N@ep-tiny-snow-amc725bi-pooler.c-5.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&schema=video_editor"
       
       - key: NEXTAUTH_SECRET
         generateValue: true
