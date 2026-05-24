@@ -52,6 +52,7 @@ function RegisterPageContent() {
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const googleAuthHref =
@@ -331,13 +332,52 @@ function RegisterPageContent() {
 						</div>
 						<Button
 							type="submit"
-							className="w-full bg-linear-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-slate-900 dark:text-slate-100 font-bold py-6 text-base rounded-xl transition-all duration-300 shadow-xl shadow-purple-950/20 active:scale-[0.98]"
-							disabled={isLoading}
+							className="w-full bg-linear-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-slate-900 dark:text-slate-100 font-bold py-6 text-base rounded-xl transition-all duration-300 shadow-xl shadow-purple-950/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+							disabled={isLoading || !acceptedTerms}
 						>
 							{isLoading
 								? "Submitting Registration..."
 								: "Request Registration Access"}
 						</Button>
+
+						{/* Terms & Conditions */}
+						<label className="flex items-start gap-3 cursor-pointer group">
+							<div className="relative mt-0.5 shrink-0">
+								<input
+									id="accept-terms"
+									type="checkbox"
+									checked={acceptedTerms}
+									onChange={(e) => setAcceptedTerms(e.target.checked)}
+									disabled={isLoading}
+									className="peer sr-only"
+								/>
+								<div className="h-4 w-4 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all flex items-center justify-center">
+									{acceptedTerms && (
+										<Check className="h-2.5 w-2.5 text-white" />
+									)}
+								</div>
+							</div>
+							<span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+								I have read and agree to the{" "}
+								<Link
+									href="/terms"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-purple-500 hover:text-purple-400 underline underline-offset-2 font-semibold"
+								>
+									Terms &amp; Conditions
+								</Link>{" "}
+								and{" "}
+								<Link
+									href="/privacy"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-purple-500 hover:text-purple-400 underline underline-offset-2 font-semibold"
+								>
+									Privacy Policy
+								</Link>
+							</span>
+						</label>
 						<p className="text-center text-sm text-slate-500 dark:text-slate-400">
 							Already have an account?{" "}
 							<Link
