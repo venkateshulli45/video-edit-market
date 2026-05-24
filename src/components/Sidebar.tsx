@@ -3,6 +3,8 @@
 import {
 	Briefcase,
 	Calendar,
+	ChevronLeft,
+	ChevronRight,
 	FileText,
 	Laptop,
 	LogOut,
@@ -28,7 +30,6 @@ import {
 	SidebarMenuButton,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarTrigger,
 	SidebarRail,
 	useSidebar,
 } from "@/components/ui/sidebar";
@@ -81,7 +82,7 @@ export default function Sidebar({
 	activeAdminTab,
 	onAdminTabChange,
 }: SidebarProps) {
-	const { state } = useSidebar();
+	const { state, toggleSidebar } = useSidebar();
 	const isCollapsed = state === "collapsed";
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme } = useTheme();
@@ -125,8 +126,27 @@ export default function Sidebar({
 			collapsible="icon"
 			className="border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-all duration-300 ease-in-out select-none"
 		>
+			{/* Floating toggle button on the right edge */}
+			<button
+				type="button"
+				onClick={toggleSidebar}
+				className="absolute -right-3 top-5 h-6 w-6 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shadow-md transition-all cursor-pointer z-50 hover:scale-105 active:scale-95"
+				title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+			>
+				{isCollapsed ? (
+					<ChevronRight className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+				) : (
+					<ChevronLeft className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+				)}
+			</button>
+
 			{/* Header section (Logo and Title) */}
-			<SidebarHeader className="p-4 flex flex-row items-center justify-between border-b border-slate-200 dark:border-slate-800 h-16 shrink-0">
+			<SidebarHeader
+				className={cn(
+					"flex flex-row items-center border-b border-slate-200 dark:border-slate-800 h-16 shrink-0 transition-all duration-300",
+					isCollapsed ? "justify-center p-2" : "justify-between p-4",
+				)}
+			>
 				<div className="flex items-center space-x-3 overflow-hidden">
 					<div className="h-8 w-8 rounded-lg bg-linear-to-r from-purple-500 via-pink-500 to-blue-500 p-1 flex items-center justify-center font-extrabold text-white text-sm shrink-0">
 						M
@@ -137,9 +157,6 @@ export default function Sidebar({
 						</span>
 					)}
 				</div>
-				{!isCollapsed && (
-					<SidebarTrigger className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-500 dark:text-slate-400 transition-colors" />
-				)}
 			</SidebarHeader>
 
 			{/* Role Toggle Switch (If user has multiple roles) */}
