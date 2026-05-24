@@ -8,6 +8,7 @@ import {
 	FileText,
 	Laptop,
 	LogOut,
+	MessageSquare,
 	Moon,
 	PlusCircle,
 	Search,
@@ -307,6 +308,17 @@ export default function Sidebar({
 											<span>Edit Client Profile</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
+
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href="/dashboard/messages" />}
+											isActive={pathname.startsWith("/dashboard/messages")}
+											tooltip="Messages"
+										>
+											<MessageSquare className="h-4.5 w-4.5 shrink-0" />
+											<span>Messages</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
 								</>
 							) : (
 								/* PROVIDER NAVIGATION LINKS */
@@ -352,6 +364,17 @@ export default function Sidebar({
 										>
 											<User className="h-4.5 w-4.5 shrink-0" />
 											<span>Professional Profile</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href="/dashboard/messages" />}
+											isActive={pathname.startsWith("/dashboard/messages")}
+											tooltip="Messages"
+										>
+											<MessageSquare className="h-4.5 w-4.5 shrink-0" />
+											<span>Messages</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
 								</>
