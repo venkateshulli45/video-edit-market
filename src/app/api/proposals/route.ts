@@ -15,6 +15,44 @@ export async function GET(req: NextRequest) {
 		const { searchParams } = new URL(req.url);
 		const jobId = searchParams.get("jobId");
 		const isProviderQuery = searchParams.get("provider") === "true";
+		const mineForJob = searchParams.get("mineForJob");
+
+		if (mineForJob) {
+			const isProvider = session.roles.some(
+				(r) => r.name.toUpperCase() === "PROVIDER" && r.status === "approved",
+			);
+			if (!isProvider) {
+				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+			}
+
+			const proposal = await db.proposal.findUnique({
+				where: {
+					unique_job_provider_proposal: {
+						jobId: mineForJob,
+						providerId: session.userId,
+					},
+				},
+			});
+
+			if (!proposal) {
+				return NextResponse.json(
+					{ error: "Proposal not found" },
+					{ status: 404 },
+				);
+			}
+
+			return NextResponse.json({
+				proposal: {
+					id: proposal.id,
+					jobId: proposal.jobId,
+					bidAmount: proposal.bidAmount,
+					estimatedDays: proposal.estimatedDays,
+					proposalText: proposal.proposalText,
+					status: proposal.status,
+					createdAt: proposal.createdAt,
+				},
+			});
+		}
 
 		if (jobId) {
 			// Fetch proposals for a job, verify requester is the job owner/client
@@ -98,6 +136,7 @@ export async function GET(req: NextRequest) {
 
 			const formattedProposals = proposals.map((prop) => ({
 				id: prop.id,
+				jobId: prop.jobId,
 				bidAmount: prop.bidAmount,
 				estimatedDays: prop.estimatedDays,
 				proposalText: prop.proposalText,
@@ -140,6 +179,11 @@ export async function POST(req: NextRequest) {
 		// Check if job exists and is still open ('posted')
 		const job = await db.job.findUnique({
 			where: { id: jobId },
+			include: {
+				client: {
+					select: { id: true },
+				},
+			},
 		});
 
 		if (!job) {
@@ -170,6 +214,11 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		const providerProfile = await db.providerProfile.findUnique({
+			where: { userId: session.userId },
+			select: { fullName: true },
+		});
+
 		const proposal = await db.proposal.create({
 			data: {
 				jobId,
@@ -181,8 +230,18 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
+		const providerName = providerProfile?.fullName || "An editor";
+		await db.notification.create({
+			data: {
+				userId: job.clientId,
+				title: "New Bid Received",
+				message: `${providerName} submitted a bid of $${parseFloat(bidAmount).toFixed(2)} on "${job.title}". Review and accept or decline. [jobId:${jobId}][proposalId:${proposal.id}]`,
+				type: "proposal_update",
+			},
+		});
+
 		return NextResponse.json({
-			message: "Proposal submitted successfully",
+			message: "Proposal submitted successfully. The client has been notified.",
 			proposal,
 		});
 	} catch (error: unknown) {
@@ -194,6 +253,79 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 		console.error("Create proposal error:", error);
+		return NextResponse.json(
+			{ error: "Internal Server Error" },
+			{ status: 500 },
+		);
+	}
+}
+
+// PUT: Update a pending proposal (Provider only, until client accepts)
+export async function PUT(req: NextRequest) {
+	try {
+		const session = await requireAuth(["PROVIDER"]);
+		const body = await req.json();
+		const { proposalId, bidAmount, estimatedDays, proposalText } = body;
+
+		if (!proposalId || bidAmount === undefined || !proposalText) {
+			return NextResponse.json(
+				{ error: "Missing required fields" },
+				{ status: 400 },
+			);
+		}
+
+		const proposal = await db.proposal.findUnique({
+			where: { id: proposalId },
+			include: { job: true },
+		});
+
+		if (!proposal) {
+			return NextResponse.json(
+				{ error: "Proposal not found" },
+				{ status: 404 },
+			);
+		}
+
+		if (proposal.providerId !== session.userId) {
+			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+		}
+
+		if (proposal.status !== "pending") {
+			return NextResponse.json(
+				{ error: "Only pending bids can be edited" },
+				{ status: 400 },
+			);
+		}
+
+		if (proposal.job.status !== "posted") {
+			return NextResponse.json(
+				{ error: "Job is no longer open for bid updates" },
+				{ status: 400 },
+			);
+		}
+
+		const updated = await db.proposal.update({
+			where: { id: proposalId },
+			data: {
+				bidAmount: parseFloat(bidAmount),
+				estimatedDays: estimatedDays ? parseInt(estimatedDays) : null,
+				proposalText,
+			},
+		});
+
+		return NextResponse.json({
+			message: "Bid updated successfully",
+			proposal: updated,
+		});
+	} catch (error: unknown) {
+		const err = error as Error;
+		if (err.message === "Unauthorized") {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+		if (err.message === "Forbidden") {
+			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+		}
+		console.error("Update proposal error:", error);
 		return NextResponse.json(
 			{ error: "Internal Server Error" },
 			{ status: 500 },
@@ -241,6 +373,19 @@ export async function PATCH(req: NextRequest) {
 			);
 		}
 
+		if (proposal.status !== "pending") {
+			return NextResponse.json(
+				{ error: "This bid has already been reviewed" },
+				{ status: 400 },
+			);
+		}
+
+		const clientProfile = await db.clientProfile.findUnique({
+			where: { userId: session.userId },
+			select: { fullName: true },
+		});
+		const clientName = clientProfile?.fullName || "The client";
+
 		if (action === "accept") {
 			// Perform accepting within a transaction:
 			// 1. Accept this proposal
@@ -277,7 +422,25 @@ export async function PATCH(req: NextRequest) {
 					},
 				});
 
+				await tx.notification.updateMany({
+					where: {
+						userId: session.userId,
+						type: "proposal_update",
+						message: { contains: `[proposalId:${proposalId}]` },
+					},
+					data: { isRead: true },
+				});
+
 				return { acceptedProp, contract };
+			});
+
+			await db.notification.create({
+				data: {
+					userId: proposal.providerId,
+					title: "Bid Accepted",
+					message: `${clientName} accepted your bid on "${proposal.job.title}". A contract has been created.`,
+					type: "proposal_update",
+				},
 			});
 
 			return NextResponse.json({
@@ -289,6 +452,24 @@ export async function PATCH(req: NextRequest) {
 			const rejectedProp = await db.proposal.update({
 				where: { id: proposalId },
 				data: { status: "rejected" },
+			});
+
+			await db.notification.updateMany({
+				where: {
+					userId: session.userId,
+					type: "proposal_update",
+					message: { contains: `[proposalId:${proposalId}]` },
+				},
+				data: { isRead: true },
+			});
+
+			await db.notification.create({
+				data: {
+					userId: proposal.providerId,
+					title: "Bid Declined",
+					message: `${clientName} declined your bid on "${proposal.job.title}".`,
+					type: "proposal_update",
+				},
 			});
 
 			return NextResponse.json({

@@ -71,6 +71,7 @@ export async function GET(req: NextRequest) {
 						},
 						select: {
 							id: true,
+							status: true,
 						},
 					},
 				},
@@ -93,6 +94,9 @@ export async function GET(req: NextRequest) {
 				category: job.category,
 				clientName: job.client.clientProfile?.fullName || job.client.email,
 				hasBid: job.proposals.length > 0,
+				pendingProposalId:
+					job.proposals.find((p) => p.status === "pending")?.id ?? null,
+				canEditBid: job.proposals.some((p) => p.status === "pending"),
 			}));
 
 			return NextResponse.json({ jobs: formattedJobs });

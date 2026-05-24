@@ -46,6 +46,8 @@ export interface Job {
 	category: { name: string };
 	clientName?: string;
 	hasBid?: boolean;
+	pendingProposalId?: string | null;
+	canEditBid?: boolean;
 	_count?: { proposals: number };
 }
 
@@ -60,6 +62,7 @@ export interface Proposal {
 	providerBio?: string;
 	providerSkills?: string[];
 	providerRating?: string | number;
+	jobId?: string;
 	jobTitle?: string;
 	jobBudget?: string | number;
 	jobStatus?: string;

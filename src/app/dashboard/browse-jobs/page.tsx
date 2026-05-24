@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Search, Clock } from "lucide-react";
-import { useDashboard } from "@/components/dashboard-context";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Clock, Search } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useDashboard } from "@/components/dashboard-context";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export default function BrowseJobsPage() {
 	const { availableJobs, fetchProviderData, loadCategories } = useDashboard();
@@ -143,7 +143,17 @@ export default function BrowseJobsPage() {
 										</p>
 									</div>
 
-									{job.hasBid ? (
+									{job.canEditBid ? (
+										<Link
+											href={`/dashboard/edit-bid/${job.id}`}
+											className={cn(
+												buttonVariants({ variant: "outline", size: "sm" }),
+												"border-yellow-500/40 text-yellow-600 dark:text-yellow-400 font-bold px-4 py-1.5 h-auto text-xs",
+											)}
+										>
+											Edit Bid (Pending)
+										</Link>
+									) : job.hasBid ? (
 										<span className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold">
 											Proposal Submitted
 										</span>

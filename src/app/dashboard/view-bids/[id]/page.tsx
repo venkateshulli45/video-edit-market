@@ -1,12 +1,12 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { ArrowLeft, Award, Calendar, Check, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Award, ArrowLeft, Star, Calendar, Trash2, Check } from "lucide-react";
+import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useDashboard, type Proposal } from "@/components/dashboard-context";
-import { Card } from "@/components/ui/card";
+import { type Proposal, useDashboard } from "@/components/dashboard-context";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export default function ViewBidsPage({
 	params,
@@ -203,6 +203,12 @@ export default function ViewBidsPage({
 							<div className="bg-slate-50 dark:bg-slate-950/40 p-4 rounded-lg border border-slate-200 dark:border-slate-800 text-sm text-slate-650 dark:text-slate-350 italic">
 								&quot;{prop.proposalText}&quot;
 							</div>
+
+							{prop.status === "pending" && job.status === "posted" && (
+								<p className="text-2xs text-slate-400 font-medium">
+									The editor can update this bid until you accept or decline.
+								</p>
+							)}
 
 							<div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 justify-between items-center gap-y-3">
 								<div className="flex flex-wrap gap-1">

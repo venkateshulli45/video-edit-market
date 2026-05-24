@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { Clock, Award } from "lucide-react";
-import { useDashboard } from "@/components/dashboard-context";
-import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Award, Clock, Pencil } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useDashboard } from "@/components/dashboard-context";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function MyProposalsPage() {
 	const { myProposals, fetchProviderData } = useDashboard();
@@ -93,19 +93,37 @@ export default function MyProposalsPage() {
 								Your pitch: &quot;{prop.proposalText}&quot;
 							</div>
 
-							<div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-								<span className="text-slate-400">Submission status:</span>
-								<span
-									className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
-										prop.status === "accepted"
-											? "bg-green-500/10 text-green-400"
-											: prop.status === "rejected"
-												? "bg-red-500/10 text-red-400"
-												: "bg-yellow-500/10 text-yellow-400"
-									}`}
-								>
-									{prop.status}
+							<div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800 text-xs gap-3">
+								<span className="text-slate-400">
+									{prop.status === "pending"
+										? "Awaiting client review — you can still edit"
+										: "Submission status:"}
 								</span>
+								<div className="flex items-center gap-2 shrink-0">
+									{prop.status === "pending" && prop.jobId && (
+										<Link
+											href={`/dashboard/edit-bid/${prop.jobId}`}
+											className={cn(
+												buttonVariants({ variant: "outline", size: "sm" }),
+												"h-auto py-1 px-2.5 text-xs font-semibold flex items-center gap-1 border-blue-500/40 text-blue-500",
+											)}
+										>
+											<Pencil className="h-3 w-3" />
+											Edit Bid
+										</Link>
+									)}
+									<span
+										className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
+											prop.status === "accepted"
+												? "bg-green-500/10 text-green-400"
+												: prop.status === "rejected"
+													? "bg-red-500/10 text-red-400"
+													: "bg-yellow-500/10 text-yellow-400"
+										}`}
+									>
+										{prop.status}
+									</span>
+								</div>
 							</div>
 						</Card>
 					))}

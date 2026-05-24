@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	Award,
 	Briefcase,
 	Calendar,
 	ChevronLeft,
@@ -18,24 +19,24 @@ import {
 	UserCheck,
 	Users,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 import {
 	Sidebar as ShadcnSidebar,
 	SidebarContent,
 	SidebarFooter,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuItem,
-	SidebarMenuButton,
 	SidebarGroup,
 	SidebarGroupContent,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
 	SidebarRail,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 interface RoleSession {
 	name: string;
@@ -273,6 +274,17 @@ export default function Sidebar({
 										>
 											<PlusCircle className="h-4.5 w-4.5 shrink-0" />
 											<span>Post service request</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href="/dashboard/bid-requests" />}
+											isActive={pathname === "/dashboard/bid-requests"}
+											tooltip="Bid Requests"
+										>
+											<Award className="h-4.5 w-4.5 shrink-0" />
+											<span>Bid Requests</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
 
