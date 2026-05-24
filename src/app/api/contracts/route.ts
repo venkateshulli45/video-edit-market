@@ -14,6 +14,7 @@ export async function GET() {
 			include: {
 				job: {
 					select: {
+						id: true,
 						title: true,
 						description: true,
 					},
@@ -47,6 +48,7 @@ export async function GET() {
 		// Format output
 		const formattedContracts = contracts.map((c) => ({
 			id: c.id,
+			jobId: c.job.id,
 			jobTitle: c.job.title,
 			jobDescription: c.job.description,
 			clientId: c.clientId,

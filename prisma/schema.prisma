@@ -77,6 +77,11 @@ enum NotificationType {
   system
 }
 
+enum WorkMediaType {
+  image
+  video
+}
+
 model User {
   id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email            String            @unique
@@ -90,6 +95,7 @@ model User {
   providerProfile  ProviderProfile?
   jobs             Job[]
   proposals        Proposal[]
+  jobWorkUploads   JobWorkUpload[]
   clientContracts  Contract[]        @relation("ClientContracts")
   providerContracts Contract[]       @relation("ProviderContracts")
   sentTransactions Transaction[]     @relation("SentTransactions")
@@ -192,6 +198,7 @@ model Job {
   proposals      Proposal[]
   contracts      Contract[]
   chatRooms      ChatRoom[]
+  workUploads    JobWorkUpload[]
 
   @@map("jobs")
 }
@@ -247,8 +254,27 @@ model Contract {
   transactions Transaction[]
   disputes     Dispute[]
   reviews      Review[]
+  workUploads  JobWorkUpload[]
 
   @@map("contracts")
+}
+
+model JobWorkUpload {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobId      String        @map("job_id") @db.Uuid
+  contractId String        @map("contract_id") @db.Uuid
+  providerId String        @map("provider_id") @db.Uuid
+  mediaType  WorkMediaType @map("media_type")
+  fileUrl    String        @map("file_url")
+  fileName   String?       @map("file_name")
+  fileSize   Int?          @map("file_size")
+  note       String?
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  job        Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  contract   Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  provider   User          @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@map("job_work_uploads")
 }
 
 model Milestone {

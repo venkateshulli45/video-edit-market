@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, Clock, Pencil } from "lucide-react";
+import { Award, Clock, Pencil, Upload } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useDashboard } from "@/components/dashboard-context";
@@ -100,6 +100,18 @@ export default function MyProposalsPage() {
 										: "Submission status:"}
 								</span>
 								<div className="flex items-center gap-2 shrink-0">
+									{prop.status === "accepted" && prop.jobId && (
+										<Link
+											href={`/dashboard/deliver-work/${prop.jobId}`}
+											className={cn(
+												buttonVariants({ variant: "default", size: "sm" }),
+												"h-auto py-1 px-2.5 text-xs font-semibold flex items-center gap-1 bg-green-600 hover:bg-green-500 text-white",
+											)}
+										>
+											<Upload className="h-3 w-3" />
+											Upload Work
+										</Link>
+									)}
 									{prop.status === "pending" && prop.jobId && (
 										<Link
 											href={`/dashboard/edit-bid/${prop.jobId}`}

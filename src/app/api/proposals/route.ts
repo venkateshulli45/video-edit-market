@@ -440,7 +440,7 @@ export async function PATCH(req: NextRequest) {
 				data: {
 					userId: proposal.providerId,
 					title: "Bid Accepted",
-					message: `${clientName} accepted your bid on "${proposal.job.title}". A contract has been created.`,
+					message: `${clientName} accepted your bid on "${proposal.job.title}". Upload work at /dashboard/deliver-work/${proposal.jobId}. [jobId:${proposal.jobId}]`,
 					type: "proposal_update",
 				},
 			});

@@ -1,13 +1,32 @@
 "use client";
 
-import { ArrowLeft, Award, Calendar, Check, Star, Trash2 } from "lucide-react";
+import {
+	ArrowLeft,
+	Award,
+	Calendar,
+	Check,
+	Pencil,
+	Star,
+	Trash2,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { type Proposal, useDashboard } from "@/components/dashboard-context";
 import { StartChatButton } from "@/components/start-chat-button";
+import { WorkUploadPanel } from "@/components/work-upload-panel";
+import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+const PROPOSAL_SORT_ORDER: Record<Proposal["status"], number> = {
+	accepted: 0,
+	pending: 1,
+	rejected: 2,
+	withdrawn: 3,
+};
 
 export default function ViewBidsPage({
 	params,
@@ -26,6 +45,16 @@ export default function ViewBidsPage({
 	const [isActionSubmitting, setIsActionSubmitting] = useState(false);
 
 	const job = postedJobs.find((j) => j.id === id);
+
+	const sortedProposals = useMemo(
+		() =>
+			[...jobProposals].sort(
+				(a, b) =>
+					(PROPOSAL_SORT_ORDER[a.status] ?? 99) -
+					(PROPOSAL_SORT_ORDER[b.status] ?? 99),
+			),
+		[jobProposals],
+	);
 
 	useEffect(() => {
 		const fetchProposals = async () => {
@@ -153,7 +182,31 @@ export default function ViewBidsPage({
 						<strong className="capitalize text-yellow-400">{job.status}</strong>
 					</span>
 				</div>
+				{job.status === "posted" && (
+					<div className="mt-4 flex flex-wrap items-center gap-3">
+						<p className="text-xs text-slate-500 dark:text-slate-400">
+							You can edit this post until you accept a bid.
+						</p>
+						<Link
+							href={`/dashboard/edit-job/${id}`}
+							className={cn(
+								buttonVariants({ variant: "outline", size: "sm" }),
+								"gap-1.5 border-purple-500/40 text-purple-600 dark:text-purple-400 font-semibold",
+							)}
+						>
+							<Pencil className="h-3.5 w-3.5" />
+							Edit job post
+						</Link>
+					</div>
+				)}
 			</header>
+
+			{(job.status === "assigned" || job.status === "in_progress") && (
+				<WorkUploadPanel
+					jobId={id}
+					title="Editor work updates"
+				/>
+			)}
 
 			{isLoadingProposals ? (
 				<div className="text-center py-8 text-slate-500">
@@ -170,10 +223,17 @@ export default function ViewBidsPage({
 				</div>
 			) : (
 				<div className="space-y-4">
-					{jobProposals.map((prop) => (
+					{sortedProposals.map((prop) => (
 						<Card
 							key={prop.id}
-							className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-4 hover:shadow-xs transition-all"
+							className={cn(
+								"border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-4 transition-shadow",
+								"shadow-[0_8px_30px_rgba(15,23,42,0.08)] hover:shadow-[0_12px_40px_rgba(15,23,42,0.12)]",
+								"dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)]",
+								prop.status === "accepted" &&
+									"ring-2 ring-green-500/25 border-green-500/30",
+								prop.status === "rejected" && "opacity-90",
+							)}
 						>
 							<div className="flex justify-between items-start gap-4">
 								<div>
@@ -259,11 +319,16 @@ export default function ViewBidsPage({
 											/>
 										)}
 										<span
-											className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
-												prop.status === "accepted"
-													? "bg-green-500/10 text-green-400"
-													: "bg-slate-100 dark:bg-slate-800 text-slate-400"
-											}`}
+											className={cn(
+												"px-3 py-1 rounded-full text-xs font-bold capitalize",
+												prop.status === "accepted" &&
+													"bg-green-500/10 text-green-400",
+												prop.status === "rejected" &&
+													"bg-red-500/10 text-red-400",
+												prop.status !== "accepted" &&
+													prop.status !== "rejected" &&
+													"bg-slate-100 dark:bg-slate-800 text-slate-400",
+											)}
 										>
 											Status: {prop.status}
 										</span>

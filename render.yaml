@@ -54,3 +54,15 @@ services:
       - key: EMAIL_FROM
         sync: false
         placeholder: "noreply@yourdomain.com (optional)"
+
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+        placeholder: "Your Cloudinary cloud name"
+
+      - key: CLOUDINARY_API_KEY
+        sync: false
+        placeholder: "Your Cloudinary API key"
+
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+        placeholder: "Your Cloudinary API secret"

@@ -84,6 +84,7 @@ export interface Provider {
 
 export interface Contract {
 	id: string;
+	jobId: string;
 	jobTitle: string;
 	jobDescription: string;
 	clientId: string;

@@ -6,8 +6,10 @@ import {
 	Clock,
 	FileText,
 	MapPin,
+	Pencil,
 	Plus,
 	Search,
+	Upload,
 	User,
 } from "lucide-react";
 import Link from "next/link";
@@ -193,10 +195,10 @@ export default function DashboardPage() {
 												</div>
 											</div>
 
-											<div className="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 gap-2">
-												<div className="flex space-x-4">
-													<span className="flex items-center space-x-1">
-														<Clock className="h-3.5 w-3.5" />
+											<div className="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+												<div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+													<span className="flex items-center gap-1">
+														<Clock className="h-3.5 w-3.5 shrink-0" />
 														<span>
 															{job.deadline
 																? new Date(job.deadline).toLocaleDateString()
@@ -204,8 +206,8 @@ export default function DashboardPage() {
 														</span>
 													</span>
 													{job.location && (
-														<span className="flex items-center space-x-1">
-															<MapPin className="h-3.5 w-3.5" />
+														<span className="flex items-center gap-1">
+															<MapPin className="h-3.5 w-3.5 shrink-0" />
 															<span>{job.location}</span>
 														</span>
 													)}
@@ -220,15 +222,35 @@ export default function DashboardPage() {
 													</span>
 												</div>
 
-												<Link
-													href={`/dashboard/view-bids/${job.id}`}
-													className={cn(
-														buttonVariants({ variant: "default", size: "sm" }),
-														"bg-purple-650 hover:bg-purple-550 text-white font-bold px-3 py-1.5 h-auto text-xs",
+												<div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+													<Link
+														href={`/dashboard/view-bids/${job.id}`}
+														className={cn(
+															buttonVariants({ variant: "default", size: "sm" }),
+															"justify-center bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 h-auto text-xs sm:whitespace-nowrap",
+														)}
+													>
+														{job.status === "assigned" ||
+														job.status === "in_progress"
+															? "View bids & work updates"
+															: `View Bids (${job._count?.proposals || 0})`}
+													</Link>
+													{job.status === "posted" && (
+														<Link
+															href={`/dashboard/edit-job/${job.id}`}
+															className={cn(
+																buttonVariants({
+																	variant: "outline",
+																	size: "sm",
+																}),
+																"justify-center font-bold px-3 py-1.5 h-auto text-xs gap-1 sm:whitespace-nowrap border-purple-500/40 text-purple-600 dark:text-purple-400",
+															)}
+														>
+															<Pencil className="h-3 w-3 shrink-0" />
+															Edit post
+														</Link>
 													)}
-												>
-													View Bids ({job._count?.proposals || 0})
-												</Link>
+												</div>
 											</div>
 										</Card>
 									))}
@@ -397,6 +419,20 @@ export default function DashboardPage() {
 													/>
 												</div>
 											</div>
+											{c.jobId && (
+												<div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+													<Link
+														href={`/dashboard/deliver-work/${c.jobId}`}
+														className={cn(
+															buttonVariants({ variant: "default", size: "sm" }),
+															"bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5",
+														)}
+													>
+														<Upload className="h-3.5 w-3.5" />
+														Upload images & videos
+													</Link>
+												</div>
+											)}
 										</Card>
 									))}
 								</div>
