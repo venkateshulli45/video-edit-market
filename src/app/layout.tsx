@@ -15,9 +15,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Multi-Service Marketplace Platform",
+	title: "VideoEdit Market — Hire Expert Video Editors",
 	description:
-		"A secure, scalable two-sided marketplace for clients and service providers",
+		"A secure, scalable two-sided marketplace connecting clients with professional video editors and post-production specialists.",
+	icons: {
+		icon: [
+			{ url: "/app-icon.svg", type: "image/svg+xml" },
+		],
+		apple: "/app-icon.svg",
+		shortcut: "/app-icon.svg",
+	},
 };
 
 export default function RootLayout({

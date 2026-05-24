@@ -564,7 +564,7 @@ export default function AdminPage() {
 																adminRole ? adminRole.status : "none",
 															);
 														}}
-														className="bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-700 px-3 py-1.5 h-auto text-xs rounded-lg inline-flex items-center justify-center font-medium"
+														className="bg-purple-50 hover:bg-purple-100 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30 px-3 py-1.5 h-auto text-xs rounded-lg inline-flex items-center justify-center font-semibold transition-colors"
 													>
 														Modify
 													</DialogTrigger>
