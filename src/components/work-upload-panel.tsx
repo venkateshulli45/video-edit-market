@@ -1,6 +1,6 @@
 "use client";
 
-import { ImagePlus, Loader2, Upload, Video } from "lucide-react";
+import { Check, ImagePlus, Loader2, Upload, Video } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,19 +25,27 @@ export interface WorkUpload {
 interface WorkUploadPanelProps {
 	jobId: string;
 	canUpload?: boolean;
+	canAcceptProgress?: boolean;
+	jobStatus?: string;
+	onProgressAccepted?: () => void;
 	title?: string;
 }
 
 export function WorkUploadPanel({
 	jobId,
 	canUpload = false,
+	canAcceptProgress = false,
+	jobStatus,
+	onProgressAccepted,
 	title = "Work updates",
 }: WorkUploadPanelProps) {
 	const [uploads, setUploads] = useState<WorkUpload[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUploading, setIsUploading] = useState(false);
+	const [isAccepting, setIsAccepting] = useState(false);
 	const [note, setNote] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const isJobComplete = jobStatus === "completed";
 
 	const loadUploads = useCallback(async () => {
 		try {
@@ -131,11 +139,60 @@ export function WorkUploadPanel({
 		}
 	};
 
+	const handleAcceptProgress = async () => {
+		setIsAccepting(true);
+		try {
+			const res = await fetch(`/api/jobs/${jobId}/accept-progress`, {
+				method: "PATCH",
+			});
+			const data = await res.json();
+			if (res.ok) {
+				toast.success(data.message || "Progress accepted — job complete!");
+				onProgressAccepted?.();
+			} else {
+				toast.error(data.error || "Could not accept progress");
+			}
+		} catch {
+			toast.error("Failed to accept progress");
+		} finally {
+			setIsAccepting(false);
+		}
+	};
+
 	return (
 		<div className="space-y-4">
-			<h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-				{title}
-			</h3>
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+					{title}
+				</h3>
+				{canAcceptProgress && isJobComplete && (
+					<span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-bold text-green-600 dark:text-green-400">
+						<Check className="h-3.5 w-3.5" />
+						Progress accepted
+					</span>
+				)}
+				{canAcceptProgress && !isJobComplete && (
+					<Button
+						type="button"
+						disabled={isAccepting || isLoading || uploads.length === 0}
+						onClick={handleAcceptProgress}
+						className="bg-green-600 hover:bg-green-500 text-white font-bold gap-2 shrink-0"
+					>
+						{isAccepting ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Check className="h-4 w-4" />
+						)}
+						{isAccepting ? "Accepting…" : "Accept progress"}
+					</Button>
+				)}
+			</div>
+			{canAcceptProgress && !isJobComplete && uploads.length === 0 && !isLoading && (
+				<p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
+					Accept progress becomes available once your editor uploads work for
+					you to review.
+				</p>
+			)}
 
 			{canUpload && (
 				<Card className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-5 space-y-4">

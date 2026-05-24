@@ -13,7 +13,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { type Proposal, useDashboard } from "@/components/dashboard-context";
+import {
+	type Job,
+	type Proposal,
+	useDashboard,
+} from "@/components/dashboard-context";
 import { StartChatButton } from "@/components/start-chat-button";
 import { WorkUploadPanel } from "@/components/work-upload-panel";
 import { buttonVariants } from "@/components/ui/button";
@@ -44,7 +48,16 @@ export default function ViewBidsPage({
 	const [isLoadingProposals, setIsLoadingProposals] = useState(true);
 	const [isActionSubmitting, setIsActionSubmitting] = useState(false);
 
-	const job = postedJobs.find((j) => j.id === id);
+	const jobFromContext = postedJobs.find((j) => j.id === id);
+	const [jobStatusOverride, setJobStatusOverride] = useState<Job["status"] | null>(
+		null,
+	);
+	const job = jobFromContext
+		? {
+				...jobFromContext,
+				status: jobStatusOverride ?? jobFromContext.status,
+			}
+		: undefined;
 
 	const sortedProposals = useMemo(
 		() =>
@@ -201,9 +214,17 @@ export default function ViewBidsPage({
 				)}
 			</header>
 
-			{(job.status === "assigned" || job.status === "in_progress") && (
+			{(job.status === "assigned" ||
+				job.status === "in_progress" ||
+				job.status === "completed") && (
 				<WorkUploadPanel
 					jobId={id}
+					canAcceptProgress
+					jobStatus={job.status}
+					onProgressAccepted={() => {
+						setJobStatusOverride("completed");
+						void fetchClientData();
+					}}
 					title="Editor work updates"
 				/>
 			)}

@@ -230,10 +230,12 @@ export default function DashboardPage() {
 															"justify-center bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 h-auto text-xs sm:whitespace-nowrap",
 														)}
 													>
-														{job.status === "assigned" ||
-														job.status === "in_progress"
-															? "View bids & work updates"
-															: `View Bids (${job._count?.proposals || 0})`}
+														{job.status === "completed"
+															? "View completed work"
+															: job.status === "assigned" ||
+																	job.status === "in_progress"
+																? "Review work & accept progress"
+																: `View Bids (${job._count?.proposals || 0})`}
 													</Link>
 													{job.status === "posted" && (
 														<Link
