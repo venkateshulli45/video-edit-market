@@ -105,7 +105,7 @@ export default function RegisterPage() {
 				<button
 					type="button"
 					onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-					className="absolute top-4 right-4 z-50 p-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 backdrop-blur-md text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-all shadow-md cursor-pointer"
+					className="absolute top-4 right-4 z-50 p-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 backdrop-blur-md text-slate-500 hover:text-slate-900 dark:text-slate-100 transition-all shadow-md cursor-pointer"
 					title="Toggle theme"
 				>
 					{theme === "dark" ? (
@@ -201,7 +201,7 @@ export default function RegisterPage() {
 								<button
 									type="button"
 									onClick={() => setShowPassword(!showPassword)}
-									className="absolute right-3 top-3 text-slate-500 dark:text-slate-400/70 hover:text-slate-500 dark:text-slate-400"
+									className="absolute right-3 top-3 text-slate-500 dark:text-slate-400/70 hover:text-slate-500"
 								>
 									{showPassword ? (
 										<EyeOff className="h-4 w-4" />
@@ -225,7 +225,7 @@ export default function RegisterPage() {
 									className={`text-left w-full cursor-pointer rounded-xl border p-4 flex items-start space-x-3 transition-all duration-300 ${
 										selectedRoles.includes("CLIENT")
 											? "border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/5"
-											: "border-slate-200 dark:border-slate-800 bg-slate-100/20 dark:bg-slate-800/20 hover:border-slate-700 hover:bg-slate-100 dark:bg-slate-800/40"
+											: "border-slate-200 dark:border-slate-800 bg-slate-100/20 dark:bg-slate-800/20 hover:border-slate-700 hover:bg-slate-100"
 									}`}
 								>
 									<div
@@ -255,7 +255,7 @@ export default function RegisterPage() {
 									className={`text-left w-full cursor-pointer rounded-xl border p-4 flex items-start space-x-3 transition-all duration-300 ${
 										selectedRoles.includes("PROVIDER")
 											? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/5"
-											: "border-slate-200 dark:border-slate-800 bg-slate-100/20 dark:bg-slate-800/20 hover:border-slate-700 hover:bg-slate-100 dark:bg-slate-800/40"
+											: "border-slate-200 dark:border-slate-800 bg-slate-100/20 dark:bg-slate-800/20 hover:border-slate-700 hover:bg-slate-100"
 									}`}
 								>
 									<div
