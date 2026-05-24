@@ -66,3 +66,11 @@ services:
       - key: CLOUDINARY_API_SECRET
         sync: false
         placeholder: "Your Cloudinary API secret"
+
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+        placeholder: "Google OAuth client ID"
+
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+        placeholder: "Google OAuth client secret"

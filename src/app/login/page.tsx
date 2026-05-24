@@ -2,12 +2,14 @@
 
 import { Eye, EyeOff, Lock, Mail, Moon, Shield, Sun } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
+import { GoogleAuthButton } from "@/components/google-auth-button";
 import { Button } from "@/components/ui/button";
+import { resolvePostLoginPath } from "@/lib/post-login-redirect";
 import {
 	Card,
 	CardContent,
@@ -20,19 +22,40 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen flex items-center justify-center bg-background" />
+			}
+		>
+			<LoginPageContent />
+		</Suspense>
+	);
+}
+
+function LoginPageContent() {
 	const { theme, setTheme } = useTheme();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [mounted, setMounted] = useState(false);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+
 	useEffect(() => {
 		const t = setTimeout(() => {
 			setMounted(true);
 		}, 0);
 		return () => clearTimeout(t);
 	}, []);
-	const router = useRouter();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [showPassword, setShowPassword] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		const error = searchParams.get("error");
+		if (error) {
+			toast.error(error);
+		}
+	}, [searchParams]);
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -58,25 +81,9 @@ export default function LoginPage() {
 
 			toast.success("Login successful!");
 
-			interface Role {
-				name: string;
-				status: string;
-			}
-			const roles = (data.user.roles || []) as Role[];
-			const hasAdmin = roles.some(
-				(r) => r.name === "ADMIN" && r.status === "approved",
-			);
-			const hasApprovedRole = roles.some((r) => r.status === "approved");
-
+			const roles = data.user.roles || [];
 			setTimeout(() => {
-				if (hasAdmin) {
-					router.push("/admin");
-				} else if (hasApprovedRole) {
-					router.push("/dashboard");
-				} else {
-					// No approved roles (all roles are pending or rejected)
-					router.push("/awaiting-approval");
-				}
+				router.push(resolvePostLoginPath(roles));
 			}, 1000);
 		} catch (err: unknown) {
 			const error = err as Error;
@@ -122,6 +129,20 @@ export default function LoginPage() {
 						Sign in to access your marketplace dashboard
 					</CardDescription>
 				</CardHeader>
+
+				<CardContent className="space-y-4 pb-0">
+					<GoogleAuthButton href="/api/auth/google?mode=login" disabled={isLoading} />
+					<div className="relative py-2">
+						<div className="absolute inset-0 flex items-center">
+							<span className="w-full border-t border-slate-200 dark:border-slate-800" />
+						</div>
+						<div className="relative flex justify-center text-xs uppercase">
+							<span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400">
+								or sign in with email
+							</span>
+						</div>
+					</div>
+				</CardContent>
 
 				<form onSubmit={handleLogin}>
 					<CardContent className="space-y-4">

@@ -12,11 +12,12 @@ import {
 	User,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
+import { GoogleAuthButton } from "@/components/google-auth-button";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -30,21 +31,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen flex items-center justify-center bg-background" />
+			}
+		>
+			<RegisterPageContent />
+		</Suspense>
+	);
+}
+
+function RegisterPageContent() {
 	const { theme, setTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => {
-		const t = setTimeout(() => {
-			setMounted(true);
-		}, 0);
-		return () => clearTimeout(t);
-	}, []);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const [mounted, setMounted] = useState(false);
 	const [fullName, setFullName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+
+	const googleAuthHref =
+		selectedRoles.length > 0
+			? `/api/auth/google?mode=register&roles=${encodeURIComponent(selectedRoles.join(","))}&fullName=${encodeURIComponent(fullName.trim())}`
+			: "";
+
+	useEffect(() => {
+		const t = setTimeout(() => {
+			setMounted(true);
+		}, 0);
+		return () => clearTimeout(t);
+	}, []);
+
+	useEffect(() => {
+		const error = searchParams.get("error");
+		if (error) {
+			toast.error(error);
+		}
+	}, [searchParams]);
 
 	const toggleRole = (role: string) => {
 		setSelectedRoles((prev) =>
@@ -282,6 +309,26 @@ export default function RegisterPage() {
 					</CardContent>
 
 					<CardFooter className="flex flex-col space-y-4">
+						<GoogleAuthButton
+							href={googleAuthHref || "#"}
+							disabled={isLoading || selectedRoles.length === 0}
+							label="Continue with Google"
+						/>
+						{selectedRoles.length === 0 && (
+							<p className="text-xs text-center text-slate-500 dark:text-slate-400">
+								Select at least one role above to use Google sign-up.
+							</p>
+						)}
+						<div className="relative py-1">
+							<div className="absolute inset-0 flex items-center">
+								<span className="w-full border-t border-slate-200 dark:border-slate-800" />
+							</div>
+							<div className="relative flex justify-center text-xs uppercase">
+								<span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400">
+									or register with email
+								</span>
+							</div>
+						</div>
 						<Button
 							type="submit"
 							className="w-full bg-linear-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-slate-900 dark:text-slate-100 font-bold py-6 text-base rounded-xl transition-all duration-300 shadow-xl shadow-purple-950/20 active:scale-[0.98]"
