@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
+import { canAccessJobWork } from "@/lib/job-work-access";
 import { db } from "@/lib/db";
 
 type RouteContext = { params: Promise<{ jobId: string }> };
@@ -22,28 +23,6 @@ async function getAssignedContract(jobId: string, providerId: string) {
 			},
 		},
 	});
-}
-
-async function canAccessJobWork(
-	jobId: string,
-	userId: string,
-): Promise<"client" | "provider" | null> {
-	const job = await db.job.findUnique({
-		where: { id: jobId },
-		select: { clientId: true },
-	});
-
-	if (!job) return null;
-	if (job.clientId === userId) return "client";
-
-	const contract = await db.contract.findFirst({
-		where: {
-			jobId,
-			providerId: userId,
-		},
-	});
-
-	return contract ? "provider" : null;
 }
 
 export async function GET(_req: NextRequest, context: RouteContext) {

@@ -1,9 +1,18 @@
 "use client";
 
-import { Check, ImagePlus, Loader2, Upload, Video } from "lucide-react";
+import {
+	Check,
+	Download,
+	ExternalLink,
+	ImagePlus,
+	Loader2,
+	Upload,
+	Video,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +35,7 @@ interface WorkUploadPanelProps {
 	jobId: string;
 	canUpload?: boolean;
 	canAcceptProgress?: boolean;
+	canDownload?: boolean;
 	jobStatus?: string;
 	onProgressAccepted?: () => void;
 	title?: string;
@@ -35,6 +45,7 @@ export function WorkUploadPanel({
 	jobId,
 	canUpload = false,
 	canAcceptProgress = false,
+	canDownload = true,
 	jobStatus,
 	onProgressAccepted,
 	title = "Work updates",
@@ -278,7 +289,7 @@ export function WorkUploadPanel({
 									{item.mediaType}
 								</span>
 							</div>
-							<div className="p-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+							<div className="p-3 space-y-2 text-xs text-slate-500 dark:text-slate-400">
 								{item.fileName && (
 									<p className="font-semibold text-slate-700 dark:text-slate-300 truncate">
 										{item.fileName}
@@ -295,6 +306,33 @@ export function WorkUploadPanel({
 									)}
 									{new Date(item.createdAt).toLocaleString()}
 								</p>
+								{canDownload && (
+									<div className="flex flex-wrap gap-2 pt-1">
+										<a
+											href={`/api/jobs/${jobId}/work-uploads/${item.id}/download`}
+											download={item.fileName || true}
+											className={cn(
+												buttonVariants({ variant: "outline", size: "sm" }),
+												"h-8 gap-1.5 text-xs font-semibold",
+											)}
+										>
+											<Download className="h-3.5 w-3.5" />
+											Download
+										</a>
+										<a
+											href={item.fileUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className={cn(
+												buttonVariants({ variant: "ghost", size: "sm" }),
+												"h-8 gap-1.5 text-xs",
+											)}
+										>
+											<ExternalLink className="h-3.5 w-3.5" />
+											Open
+										</a>
+									</div>
+								)}
 							</div>
 						</Card>
 					))}
