@@ -12,8 +12,8 @@ import {
 	Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useDashboard, type Proposal } from "@/components/dashboard-context";
+import { useEffect } from "react";
+import { type Proposal, useDashboard } from "@/components/dashboard-context";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -28,15 +28,11 @@ interface ProposalWithMeta extends Proposal {
 
 export default function MyProposalsPage() {
 	const { myProposals, fetchProviderData } = useDashboard();
-	const [enriched, setEnriched] = useState<ProposalWithMeta[]>([]);
+	const enriched = myProposals as ProposalWithMeta[];
 
 	useEffect(() => {
 		fetchProviderData();
 	}, [fetchProviderData]);
-
-	useEffect(() => {
-		setEnriched(myProposals as ProposalWithMeta[]);
-	}, [myProposals]);
 
 	const getAssignmentState = (prop: ProposalWithMeta) => {
 		const jobDone = prop.jobStatus === "completed";
@@ -104,8 +100,7 @@ export default function MyProposalsPage() {
 									"border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-all space-y-4",
 									assignmentHref &&
 										"hover:border-blue-400/50 dark:hover:border-blue-600/50 cursor-pointer group",
-									isComplete &&
-										"ring-1 ring-green-500/20 border-green-500/20",
+									isComplete && "ring-1 ring-green-500/20 border-green-500/20",
 								)}
 							>
 								{assignmentHref ? (
@@ -128,11 +123,7 @@ export default function MyProposalsPage() {
 												? "Project completed"
 												: "Submission status:"}
 									</span>
-									<div
-										className="flex items-center gap-2 shrink-0"
-										onClick={(e) => e.stopPropagation()}
-										onKeyDown={(e) => e.stopPropagation()}
-									>
+									<div className="flex items-center gap-2 shrink-0">
 										{canUpload && prop.jobId && (
 											<Link
 												href={`/dashboard/deliver-work/${prop.jobId}`}

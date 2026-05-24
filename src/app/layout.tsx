@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "VideoEdit Market — Hire Expert Video Editors",
+	title: "EditMarket — Hire Expert Video Editors",
 	description:
 		"A secure, scalable two-sided marketplace connecting clients with professional video editors and post-production specialists.",
 	icons: {
