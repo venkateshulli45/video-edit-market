@@ -158,7 +158,10 @@ export function WorkUploadPanel({
 			});
 			const data = await res.json();
 			if (res.ok) {
-				toast.success(data.message || "Progress accepted — job complete!");
+				toast.success(
+					data.message || "Progress accepted — job complete!",
+				);
+				toast.info("Scroll down to rate your editor.");
 				onProgressAccepted?.();
 			} else {
 				toast.error(data.error || "Could not accept progress");

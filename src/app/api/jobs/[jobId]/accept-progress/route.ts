@@ -116,9 +116,10 @@ export async function PATCH(_req: NextRequest, context: RouteContext) {
 		});
 
 		return NextResponse.json({
-			message: `Progress accepted. ${providerName}'s work on this job is marked complete.`,
+			message: `Progress accepted. ${providerName}'s work on this job is marked complete. Leave a review below when you're ready.`,
 			jobStatus: "completed",
 			contractStatus: "completed",
+			contractId: contract.id,
 		});
 	} catch (error: unknown) {
 		const err = error as Error;

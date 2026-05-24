@@ -109,7 +109,6 @@ export async function GET(req: NextRequest) {
 
 			return NextResponse.json({ proposals: formattedProposals });
 		} else if (isProviderQuery) {
-			// Fetch proposals submitted by this provider
 			const proposals = await db.proposal.findMany({
 				where: { providerId: session.userId },
 				include: {
@@ -136,20 +135,67 @@ export async function GET(req: NextRequest) {
 				},
 			});
 
-			const formattedProposals = proposals.map((prop) => ({
-				id: prop.id,
-				jobId: prop.jobId,
-				bidAmount: prop.bidAmount,
-				estimatedDays: prop.estimatedDays,
-				proposalText: prop.proposalText,
-				status: prop.status,
-				createdAt: prop.createdAt,
-				jobTitle: prop.job.title,
-				jobBudget: prop.job.budget,
-				jobStatus: prop.job.status,
-				clientName:
-					prop.job.client.clientProfile?.fullName || prop.job.client.email,
-			}));
+			const jobIds = proposals.map((p) => p.jobId);
+			const contracts = await db.contract.findMany({
+				where: {
+					providerId: session.userId,
+					jobId: { in: jobIds },
+				},
+				select: {
+					id: true,
+					jobId: true,
+					status: true,
+					clientId: true,
+				},
+			});
+
+			const contractByJobId = new Map(contracts.map((c) => [c.jobId, c]));
+			const contractIds = contracts.map((c) => c.id);
+
+			const reviews = await db.review.findMany({
+				where: {
+					contractId: { in: contractIds },
+					revieweeId: session.userId,
+				},
+				select: {
+					contractId: true,
+					overallRating: true,
+					comment: true,
+				},
+			});
+
+			const reviewByContractId = new Map(
+				reviews.map((r) => [r.contractId, r]),
+			);
+
+			const formattedProposals = proposals.map((prop) => {
+				const contract = contractByJobId.get(prop.jobId);
+				const clientReview = contract
+					? reviewByContractId.get(contract.id)
+					: null;
+
+				return {
+					id: prop.id,
+					jobId: prop.jobId,
+					bidAmount: prop.bidAmount,
+					estimatedDays: prop.estimatedDays,
+					proposalText: prop.proposalText,
+					status: prop.status,
+					createdAt: prop.createdAt,
+					jobTitle: prop.job.title,
+					jobBudget: prop.job.budget,
+					jobStatus: prop.job.status,
+					contractStatus: contract?.status ?? null,
+					clientName:
+						prop.job.client.clientProfile?.fullName || prop.job.client.email,
+					clientReview: clientReview
+						? {
+								overallRating: Number(clientReview.overallRating),
+								comment: clientReview.comment,
+							}
+						: null,
+				};
+			});
 
 			return NextResponse.json({ proposals: formattedProposals });
 		}

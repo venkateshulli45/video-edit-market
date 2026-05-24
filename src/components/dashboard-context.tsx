@@ -68,8 +68,13 @@ export interface Proposal {
 	jobTitle?: string;
 	jobBudget?: string | number;
 	jobStatus?: string;
+	contractStatus?: string | null;
 	clientName?: string;
 	clientUserId?: string;
+	clientReview?: {
+		overallRating: number;
+		comment: string | null;
+	} | null;
 }
 
 export interface Provider {

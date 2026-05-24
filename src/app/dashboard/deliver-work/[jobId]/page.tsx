@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { ClientFeedbackView } from "@/components/client-feedback-view";
 import { useDashboard } from "@/components/dashboard-context";
 import { WorkUploadPanel } from "@/components/work-upload-panel";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,15 @@ export default function DeliverWorkPage({
 	const { contracts, fetchProviderData, isLoading } = useDashboard();
 	const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
-	const contract = contracts.find(
-		(c) => c.jobId === jobId && c.status !== "completed" && c.status !== "refunded",
-	);
+	const contract = contracts.find((c) => c.jobId === jobId);
+
+	const isCompleted =
+		contract?.status === "completed" || contract?.status === "refunded";
+
+	const canUpload =
+		contract &&
+		!isCompleted &&
+		["active", "submitted", "revision_requested"].includes(contract.status);
 
 	useEffect(() => {
 		fetchProviderData();
@@ -62,29 +69,49 @@ export default function DeliverWorkPage({
 	return (
 		<div className="space-y-6 max-w-4xl mx-auto">
 			<Link
-				href="/dashboard"
+				href="/dashboard/my-proposals"
 				className="flex items-center space-x-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
 			>
 				<ArrowLeft className="h-4 w-4" />
-				<span>Back to Dashboard</span>
+				<span>Back to My Proposals</span>
 			</Link>
 
 			<header className="border-b border-slate-200 dark:border-slate-800 pb-4">
-				<span className="px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-xs font-semibold">
-					Accepted assignment
-				</span>
+				{isCompleted ? (
+					<span className="px-2 py-0.5 rounded bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-semibold inline-flex items-center gap-1">
+						<CheckCircle2 className="h-3.5 w-3.5" />
+						Project complete
+					</span>
+				) : (
+					<span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-semibold">
+						Active assignment
+					</span>
+				)}
 				<h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-2">
 					{contract.jobTitle}
 				</h2>
 				<p className="text-slate-500 dark:text-slate-400 mt-1">
-					Client: {contract.clientName} · Agreed ${Number(contract.agreedPrice).toFixed(2)}
+					Client: {contract.clientName} · Agreed $
+					{Number(contract.agreedPrice).toFixed(2)}
 				</p>
+				{isCompleted && (
+					<p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+						The client accepted your work. Uploads are closed; you can review
+						submitted files and any client feedback below.
+					</p>
+				)}
 			</header>
+
+			{isCompleted && <ClientFeedbackView jobId={jobId} />}
 
 			<WorkUploadPanel
 				jobId={jobId}
-				canUpload
-				title="Upload work for client review"
+				canUpload={Boolean(canUpload)}
+				title={
+					isCompleted
+						? "Submitted work"
+						: "Upload work for client review"
+				}
 			/>
 		</div>
 	);

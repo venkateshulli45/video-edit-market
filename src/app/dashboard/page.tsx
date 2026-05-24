@@ -427,11 +427,15 @@ export default function DashboardPage() {
 														href={`/dashboard/deliver-work/${c.jobId}`}
 														className={cn(
 															buttonVariants({ variant: "default", size: "sm" }),
-															"bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5",
+															c.status === "completed"
+																? "border border-green-500/40 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-950/50 font-bold text-xs gap-1.5"
+																: "bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5",
 														)}
 													>
 														<Upload className="h-3.5 w-3.5" />
-														Upload images & videos
+														{c.status === "completed"
+															? "View assignment & feedback"
+															: "Upload images & videos"}
 													</Link>
 												</div>
 											)}

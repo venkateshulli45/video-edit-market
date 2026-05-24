@@ -19,6 +19,7 @@ import {
 	useDashboard,
 } from "@/components/dashboard-context";
 import { StartChatButton } from "@/components/start-chat-button";
+import { EditorReviewPanel } from "@/components/editor-review-panel";
 import { WorkUploadPanel } from "@/components/work-upload-panel";
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
@@ -227,6 +228,10 @@ export default function ViewBidsPage({
 					}}
 					title="Editor work updates"
 				/>
+			)}
+
+			{job.status === "completed" && (
+				<EditorReviewPanel jobId={id} jobStatus={job.status} />
 			)}
 
 			{isLoadingProposals ? (
