@@ -1,6 +1,7 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["vem"]
 }
 
 generator client {
@@ -11,12 +12,16 @@ enum RoleRequestStatus {
   pending
   approved
   rejected
+
+  @@schema("vem")
 }
 
 enum PricingModel {
   fixed
   hourly
   negotiable
+
+  @@schema("vem")
 }
 
 enum ProposalStatus {
@@ -24,6 +29,8 @@ enum ProposalStatus {
   accepted
   rejected
   withdrawn
+
+  @@schema("vem")
 }
 
 enum ContractStatus {
@@ -33,6 +40,8 @@ enum ContractStatus {
   completed
   disputed
   refunded
+
+  @@schema("vem")
 }
 
 enum MilestoneStatus {
@@ -40,12 +49,16 @@ enum MilestoneStatus {
   funded
   released
   disputed
+
+  @@schema("vem")
 }
 
 enum DeliveryStatus {
   pending_review
   accepted
   rejected
+
+  @@schema("vem")
 }
 
 enum TransactionType {
@@ -53,12 +66,16 @@ enum TransactionType {
   escrow_release
   escrow_refund
   platform_fee
+
+  @@schema("vem")
 }
 
 enum TransactionStatus {
   pending
   completed
   failed
+
+  @@schema("vem")
 }
 
 enum DisputeStatus {
@@ -66,6 +83,8 @@ enum DisputeStatus {
   resolved_refunded
   resolved_released
   resolved_split
+
+  @@schema("vem")
 }
 
 enum NotificationType {
@@ -75,11 +94,15 @@ enum NotificationType {
   message
   payment
   system
+
+  @@schema("vem")
 }
 
 enum WorkMediaType {
   image
   video
+
+  @@schema("vem")
 }
 
 model User {
@@ -108,7 +131,8 @@ model User {
   messages         Message[]
   notifications    Notification[]
 
-  @@map("users")
+  @@map("vm_users")
+  @@schema("vem")
 }
 
 model Role {
@@ -117,7 +141,8 @@ model Role {
   createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz
   userRoles UserRole[]
 
-  @@map("roles")
+  @@map("vm_roles")
+  @@schema("vem")
 }
 
 model UserRole {
@@ -130,7 +155,8 @@ model UserRole {
   role       Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
-  @@map("user_roles")
+  @@map("vm_user_roles")
+  @@schema("vem")
 }
 
 model ClientProfile {
@@ -144,7 +170,8 @@ model ClientProfile {
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("client_profiles")
+  @@map("vm_client_profiles")
+  @@schema("vem")
 }
 
 model ProviderProfile {
@@ -164,7 +191,8 @@ model ProviderProfile {
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("provider_profiles")
+  @@map("vm_provider_profiles")
+  @@schema("vem")
 }
 
 model Category {
@@ -177,7 +205,8 @@ model Category {
   subcategories Category[] @relation("CategoryHierarchy")
   jobs        Job[]
 
-  @@map("categories")
+  @@map("vm_categories")
+  @@schema("vem")
 }
 
 model Job {
@@ -201,7 +230,8 @@ model Job {
   chatRooms      ChatRoom[]
   workUploads    JobWorkUpload[]
 
-  @@map("jobs")
+  @@map("vm_jobs")
+  @@schema("vem")
 }
 
 model JobAttachment {
@@ -213,7 +243,8 @@ model JobAttachment {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
   job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
-  @@map("job_attachments")
+  @@map("vm_job_attachments")
+  @@schema("vem")
 }
 
 model Proposal {
@@ -231,7 +262,8 @@ model Proposal {
   contract      Contract?
 
   @@unique([jobId, providerId], name: "unique_job_provider_proposal")
-  @@map("proposals")
+  @@map("vm_proposals")
+  @@schema("vem")
 }
 
 model Contract {
@@ -257,7 +289,8 @@ model Contract {
   reviews      Review[]
   workUploads  JobWorkUpload[]
 
-  @@map("contracts")
+  @@map("vm_contracts")
+  @@schema("vem")
 }
 
 model JobWorkUpload {
@@ -275,7 +308,8 @@ model JobWorkUpload {
   contract   Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   provider   User          @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
-  @@map("job_work_uploads")
+  @@map("vm_job_work_uploads")
+  @@schema("vem")
 }
 
 model Milestone {
@@ -290,7 +324,8 @@ model Milestone {
   deliveries   Delivery[]
   transactions Transaction[]
 
-  @@map("milestones")
+  @@map("vm_milestones")
+  @@schema("vem")
 }
 
 model Delivery {
@@ -306,7 +341,8 @@ model Delivery {
   milestone    Milestone?     @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   revisions    Revision[]
 
-  @@map("deliveries")
+  @@map("vm_deliveries")
+  @@schema("vem")
 }
 
 model Revision {
@@ -316,7 +352,8 @@ model Revision {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
   delivery   Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
 
-  @@map("revisions")
+  @@map("vm_revisions")
+  @@schema("vem")
 }
 
 model Transaction {
@@ -336,7 +373,8 @@ model Transaction {
   sender         User              @relation("SentTransactions", fields: [senderId], references: [id])
   receiver       User              @relation("ReceivedTransactions", fields: [receiverId], references: [id])
 
-  @@map("transactions")
+  @@map("vm_transactions")
+  @@schema("vem")
 }
 
 model Dispute {
@@ -351,7 +389,8 @@ model Dispute {
   contract          Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
   raisedBy          User          @relation(fields: [raisedById], references: [id], onDelete: Restrict)
 
-  @@map("disputes")
+  @@map("vm_disputes")
+  @@schema("vem")
 }
 
 model Review {
@@ -370,7 +409,8 @@ model Review {
   reviewee           User     @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Restrict)
 
   @@unique([contractId, reviewerId], name: "unique_contract_reviewer")
-  @@map("reviews")
+  @@map("vm_reviews")
+  @@schema("vem")
 }
 
 model ChatRoom {
@@ -381,7 +421,8 @@ model ChatRoom {
   members   ChatMember[]
   messages  Message[]
 
-  @@map("chat_rooms")
+  @@map("vm_chat_rooms")
+  @@schema("vem")
 }
 
 model ChatMember {
@@ -391,7 +432,8 @@ model ChatMember {
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([roomId, userId])
-  @@map("chat_members")
+  @@map("vm_chat_members")
+  @@schema("vem")
 }
 
 model Message {
@@ -405,7 +447,8 @@ model Message {
   room        ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
   sender      User     @relation(fields: [senderId], references: [id], onDelete: Restrict)
 
-  @@map("messages")
+  @@map("vm_messages")
+  @@schema("vem")
 }
 
 model Notification {
@@ -418,5 +461,6 @@ model Notification {
   createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("notifications")
+  @@map("vm_notifications")
+  @@schema("vem")
 }

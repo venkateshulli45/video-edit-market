@@ -25,10 +25,14 @@ export interface GoogleUserInfo {
 }
 
 function getOAuthSecret(): string {
-	return (
-		process.env.NEXTAUTH_SECRET ||
-		"fallback-super-secret-key-at-least-32-chars-long"
-	);
+	const secret = process.env.NEXTAUTH_SECRET;
+	if (secret && secret.length >= 32) {
+		return secret;
+	}
+	if (process.env.NODE_ENV === "production") {
+		throw new Error("NEXTAUTH_SECRET must be set to at least 32 characters.");
+	}
+	return "fallback-super-secret-key-at-least-32-chars-long";
 }
 
 export function isGoogleOAuthConfigured(): boolean {

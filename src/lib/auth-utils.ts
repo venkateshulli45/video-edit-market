@@ -3,10 +3,18 @@ import * as jose from "jose";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 
-const JWT_SECRET =
-	process.env.NEXTAUTH_SECRET ||
-	"fallback-super-secret-key-at-least-32-chars-long";
-const secretKey = new TextEncoder().encode(JWT_SECRET);
+function getSecretKey(): Uint8Array {
+	const secret = process.env.NEXTAUTH_SECRET;
+	if (secret && secret.length >= 32) {
+		return new TextEncoder().encode(secret);
+	}
+	if (process.env.NODE_ENV === "production") {
+		throw new Error("NEXTAUTH_SECRET must be set to at least 32 characters.");
+	}
+	return new TextEncoder().encode(
+		"fallback-super-secret-key-at-least-32-chars-long",
+	);
+}
 
 export interface UserSession {
 	userId: string;
@@ -31,12 +39,12 @@ export async function signJWT(payload: UserSession): Promise<string> {
 		.setProtectedHeader({ alg: "HS256" })
 		.setIssuedAt()
 		.setExpirationTime("24h") // Session valid for 24 hours
-		.sign(secretKey);
+		.sign(getSecretKey());
 }
 
 export async function verifyJWT(token: string): Promise<UserSession | null> {
 	try {
-		const { payload } = await jose.jwtVerify(token, secretKey, {
+		const { payload } = await jose.jwtVerify(token, getSecretKey(), {
 			algorithms: ["HS256"],
 		});
 		return payload as unknown as UserSession;

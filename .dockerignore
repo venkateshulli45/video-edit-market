@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+*.md
+dummy_data.sql
+db/vm_create_and_seed.sql
+agent-transcripts
+.cursor
+**/*.pem
+**/*.key
